@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Health-check / connection test
+    match /test/{testId} {
+      allow read, write: if true;
+    }
+
+    // Comandas (1..N)
+    match /comandas/{comandaId} {
+      allow read: if true;
+      allow create, update: if isValidId(comandaId) 
+        && request.resource.data.number is number 
+        && request.resource.data.status in ['disponivel', 'em_atendimento', 'bloqueada'];
+      allow delete: if true;
+    }
+
+    // Products
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isValidId(productId) 
+        && request.resource.data.name is string 
+        && (request.resource.data.salePrice is number || request.resource.data.sellingPrice is number);
+      allow delete: if true;
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isValidId(categoryId) && request.resource.data.name is string;
+      allow delete: if true;
+    }
+
+    // Sales (Transactions)
+    match /sales/{saleId} {
+      allow read: if true;
+      allow create, update: if isValidId(saleId) 
+        && request.resource.data.total is number 
+        && request.resource.data.payments is list;
+      allow delete: if false;
+    }
+
+    // Cash Registers (Caixa)
+    match /cash_registers/{registerId} {
+      allow read: if true;
+      allow create, update: if isValidId(registerId) 
+        && request.resource.data.status in ['aberto', 'fechado', 'open', 'closed'] 
+        && request.resource.data.initialFloat is number;
+      allow delete: if false;
+    }
+
+    // Settings
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow create, update: if isValidId(settingsId) 
+        && (request.resource.data.name is string || request.resource.data.bakeryName is string);
+      allow delete: if false;
+    }
+
+    // Users
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidId(userId);
+      allow delete: if true;
+    }
+
+    // Allowed Users (Whitelist for portal entry)
+    match /allowed_users/{emailId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+  }
+}

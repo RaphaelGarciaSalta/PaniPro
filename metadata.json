@@ -1,0 +1,6 @@
+{
+  "name": "PaniPro - Gestão e PDV de Padaria",
+  "description": "Sistema completo e profissional de gestão e ponto de venda (PDV) para padarias com comandas numeradas reutilizáveis, pagamentos múltiplos, controle de caixa e relatórios gerenciais.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

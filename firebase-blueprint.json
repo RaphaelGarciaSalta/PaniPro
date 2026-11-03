@@ -1,0 +1,168 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Bakery employee or manager user account with role-based access",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the user" },
+        "name": { "type": "string", "description": "Full name of user" },
+        "email": { "type": "string", "description": "Email address of the user" },
+        "role": { "type": "string", "enum": ["admin", "atendente"], "description": "Access profile role" },
+        "status": { "type": "string", "description": "Active status of user" },
+        "createdAt": { "type": "string", "description": "ISO date string of creation" }
+      },
+      "required": ["id", "name"]
+    },
+    "Comanda": {
+      "title": "Comanda",
+      "description": "Physical reusable comanda card with numbered ID and ongoing order items",
+      "type": "object",
+      "properties": {
+        "number": { "type": "number", "description": "Permanent number printed on comanda" },
+        "status": { "type": "string", "enum": ["disponivel", "em_atendimento", "bloqueada"], "description": "Current status" },
+        "openedAt": { "type": "string", "description": "ISO timestamp when comanda was opened" },
+        "openedBy": { "type": "string", "description": "User name who opened comanda" },
+        "items": { "type": "array", "description": "List of active consumption items" },
+        "customerNote": { "type": "string", "description": "Customer name or table notes" }
+      },
+      "required": ["number", "status"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Bakery product catalog item with unit, cost price and selling price",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Product document ID" },
+        "name": { "type": "string", "description": "Product title" },
+        "categoryId": { "type": "string", "description": "Category ID" },
+        "costPrice": { "type": "number", "description": "Unit or per kg cost in R$" },
+        "salePrice": { "type": "number", "description": "Unit or per kg selling price in R$" },
+        "unit": { "type": "string", "description": "Measure unit" },
+        "active": { "type": "boolean", "description": "Whether product is active for sales" },
+        "sku": { "type": "string", "description": "SKU barcode" },
+        "createdAt": { "type": "string", "description": "Creation ISO date" }
+      },
+      "required": ["id", "name", "categoryId", "costPrice", "salePrice", "unit", "active"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product grouping category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Category document ID" },
+        "name": { "type": "string", "description": "Category name" },
+        "color": { "type": "string", "description": "Color indicator" }
+      },
+      "required": ["id", "name"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Completed transaction with historical item snapshots, split payments and cash register linkage",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Sale document ID" },
+        "code": { "type": "number", "description": "Sequential sale counter number" },
+        "comandaNumber": { "type": "number", "description": "Comanda card number finalized" },
+        "createdAt": { "type": "string", "description": "Checkout completion ISO timestamp" },
+        "cashierName": { "type": "string", "description": "Operator name" },
+        "cashRegisterId": { "type": "string", "description": "ID of open cash register shift" },
+        "items": { "type": "array", "description": "Frozen array of sold items" },
+        "subtotal": { "type": "number", "description": "Gross total in R$" },
+        "discount": { "type": "number", "description": "Discount in R$" },
+        "total": { "type": "number", "description": "Net total charged in R$" },
+        "totalCost": { "type": "number", "description": "Total Cost of Goods Sold in R$" },
+        "profit": { "type": "number", "description": "Profit in R$" },
+        "payments": { "type": "array", "description": "Array of payment method splits" },
+        "status": { "type": "string", "enum": ["finalizada", "cancelada"], "description": "Sale status" }
+      },
+      "required": ["id", "code", "comandaNumber", "cashierName", "subtotal", "total", "payments", "status", "createdAt"]
+    },
+    "CashRegister": {
+      "title": "CashRegister",
+      "description": "Cash register turn/shift tracking opening float, receipts, sangrias, suprimentos and closing reconciliation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Shift document ID" },
+        "code": { "type": "number", "description": "Shift sequential code" },
+        "status": { "type": "string", "enum": ["aberto", "fechado"], "description": "Current register state" },
+        "openedAt": { "type": "string", "description": "Opening ISO timestamp" },
+        "closedAt": { "type": "string", "description": "Closing ISO timestamp" },
+        "openedBy": { "type": "string", "description": "User who opened register" },
+        "closedBy": { "type": "string", "description": "User who closed register" },
+        "initialFloat": { "type": "number", "description": "Initial opening cash balance in R$" },
+        "movements": { "type": "array", "description": "Detailed log of sangrias and suprimentos" },
+        "salesIds": { "type": "array", "description": "List of sale IDs" }
+      },
+      "required": ["id", "code", "status", "openedAt", "openedBy", "initialFloat"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Bakery business metadata, receipt header/footer, and comanda capacity configuration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Business name" },
+        "tradeName": { "type": "string", "description": "Trade name" },
+        "cnpj": { "type": "string", "description": "Business tax ID" },
+        "address": { "type": "string", "description": "Physical store address" },
+        "city": { "type": "string", "description": "City and State" },
+        "phone": { "type": "string", "description": "Contact phone" },
+        "comandasCount": { "type": "number", "description": "Number of active physical comandas" },
+        "receiptFooterMessage": { "type": "string", "description": "Footer message on sales slips" },
+        "autoPrintReceipt": { "type": "boolean", "description": "Auto prompt print dialog" }
+      },
+      "required": ["name", "comandasCount"]
+    },
+    "AllowedUser": {
+      "title": "AllowedUser",
+      "description": "Whitelist of authorized users allowed to access the bakery management portal",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Allowed user email address" },
+        "name": { "type": "string", "description": "Display name of user" },
+        "role": { "type": "string", "enum": ["admin", "atendente"], "description": "Access profile role" },
+        "active": { "type": "boolean", "description": "Whether user is active" },
+        "createdAt": { "type": "string", "description": "Creation date" }
+      },
+      "required": ["email", "role", "active"]
+    }
+  },
+  "firestore": {
+    "/test/{testId}": {
+      "schema": { "$ref": "Settings" },
+      "description": "Health check connection document"
+    },
+    "/allowed_users/{emailId}": {
+      "schema": { "$ref": "AllowedUser" },
+      "description": "Whitelist of authorized users allowed to access the bakery portal"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "Collection of employee and manager user accounts"
+    },
+    "/comandas/{comandaId}": {
+      "schema": { "$ref": "Comanda" },
+      "description": "Numbered physical comandas currently active or available"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "Product" },
+      "description": "Bakery catalog items and prices"
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "Category" },
+      "description": "Categories for grouping bakery products"
+    },
+    "/sales/{saleId}": {
+      "schema": { "$ref": "Sale" },
+      "description": "Historical finalized sales records"
+    },
+    "/cash_registers/{cashRegisterId}": {
+      "schema": { "$ref": "CashRegister" },
+      "description": "Cash register shifts and balance reconciliations"
+    },
+    "/settings/{settingsId}": {
+      "schema": { "$ref": "Settings" },
+      "description": "Global bakery settings and receipt configuration"
+    }
+  }
+}
